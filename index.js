@@ -1,4 +1,5 @@
 const http = require("http");
+const querystring = require('querystring');
 const hostname = '127.0.0.1';
 const port = 5000;
 
@@ -33,11 +34,32 @@ const server = http.createServer(async (req, res) => {
                 res.end('Resource not found.')
             }
         } else if (method === "POST") {
-            res.end('{"message": "Are you trying to make history?"}');
+            let body = '';
+            req.on('data', (chunk) => {
+                // .toString() is built into most objects
+                // it returns a string representation of the object
+                body += chunk.toString();
+            });
+            req.on('end', async () => {
+                const parsedBody = querystring.parse(body);
+                console.log('====================');
+                console.log(parsedBody);
+                console.log('^^^^^^ BODY OF FORM ^^^^^^^^');
+                const newSongId = await Song.add(parsedBody);
+                res.end(`{"song id": ${newSongId}}`);
+            });
         } else if (method === "PUT") {
             res.end('{"message": "Are you looking to change history?"}');
         } else if (method === "DELETE") {
-            res.end('{"message": "Stop the music?"}');
+            if (parts.length === 3) {
+                const songId = parts[2];
+                await Song.delete(songId);
+                res.end(`{"message": "Deleted song with id ${songId}"}`)
+            } else {
+                res.end('{"message": "Song ID does not exist"}');
+            }
+        } else {
+            res.end('{"message": "That action does not exist."}')
         }
     }
 });
