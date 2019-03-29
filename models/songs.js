@@ -11,7 +11,6 @@ class Song {
 
     static async getAll() {
         let allSongs = await db.any(`select * from songs`);
-        console.log(allSongs)
         return allSongs
     }
 
@@ -30,7 +29,7 @@ class Song {
     }
     
     static getByTitle(title) {
-        return db.one(`select * from songs where title ilike '${title}'`)
+        return db.one(`select * from songs where title='${title}'`)
         .then((songData) => {
             const songInstance = new Song(
                 songData.id,
@@ -40,10 +39,10 @@ class Song {
                 songData.year
                 );
                 return songInstance
-            })
-            
-            
+            })    
         }
     }
 
     Song.getAll();
+
+    module.exports = Song;
